@@ -2,6 +2,8 @@ import express from "express";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 
+const data = require("./models/seed.json");
+
 const app = express();
 const port = 8000;
 const httpServer = createServer(app);
@@ -13,10 +15,27 @@ const io = new Server(httpServer, {
  * Endpoints
  */
 
-app.get("/", (req, res) => res.send("Express + TypeScript Server"));
+app.get("/", (req, res) => res.status(200).json({ message: 'Connected!' }));
 
-app.get("/teams", (req, res) => {});
-app.get("/teams/:teamId", (req, res) => {});
+app.get("/teams", (req, res) => {
+    const teams = data.teams;
+
+    res.status(200).json({teams});
+});
+app.get("/teams/:teamId", (req, res) => {
+    const id = parseInt(req.params.teamId);
+    const team = data.teams.find((t) => t.id === id);
+
+    res.status(200).json({ team });
+});
+
+app.get("/teams/:teamId/members", (req, res) => {
+  const id = parseInt(req.params.teamId);
+  const members = data.teamMembers.filter((member) => member.teamId === id);
+
+  res.status(200).json({ members });
+});
+
 app.get("/teamMembers/:memberId", (req, res) => {});
 app.patch("/teamMembers/:memberId", (req, res) => {}); // only send through the updated donutCount
 
