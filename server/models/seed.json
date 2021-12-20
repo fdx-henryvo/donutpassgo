@@ -1,0 +1,28 @@
+{
+  "teams": [
+    {
+      "id": 1,
+      "name": "Portal"
+    },
+    {
+      "id": 2,
+      "name": "TaskX"
+    }
+  ],
+  "teamMembers": [
+    {
+      "id": "039343a8-9772-4d9c-ad25-8701a1ac1068",
+      "name": "Henry Vo",
+      "teamId": 1,
+      "donutCount": 2,
+      "photoUrl": ""
+    },
+    {
+      "id": "7a5ca07f-31f5-4b60-934e-d69edb7304ef",
+      "name": "Spencer Porteous",
+      "teamId": 1,
+      "donutCount": 0,
+      "photoUrl": ""
+    }
+  ]
+}
