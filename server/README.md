@@ -18,4 +18,5 @@ Functionality:
   - teams comprise of members 1:M
   - seed teams with initial members
   - add and remove team members from teams
+- Websocket Room code per team
 - Websocket listen for button click and trigger

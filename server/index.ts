@@ -1,8 +1,29 @@
-import express from 'express';
-// rest of the code remains same
+import express from "express";
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
+
 const app = express();
-const PORT = 8000;
-app.get('/', (req, res) => res.send('Express + TypeScript Server'));
-app.listen(PORT, () => {
-  console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
+const port = 8000;
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  // options
+});
+
+/*
+ * Endpoints
+ */
+
+app.get("/", (req, res) => res.send("Express + TypeScript Server"));
+
+/*
+ * Sockets
+ */
+
+io.on("connection", (socket: Socket) => {
+  // ...
+  console.log("New websocket connection");
+});
+
+httpServer.listen(port, () => {
+  console.log(`App backend running on port ${port}!`);
 });
