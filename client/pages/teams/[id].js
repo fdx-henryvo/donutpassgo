@@ -1,8 +1,8 @@
 import useSWR from "swr";
 import Layout from "../../components/Layout";
 import TeamList from "../../components/TeamList";
-import { useContext, useState } from "react";
-import { AlertContext } from "../_app";
+import { useContext, useState, useEffect } from "react";
+import { AlertContext, SocketContext } from "../_app";
 import Modal from "react-modal";
 import useSound from "use-sound";
 
@@ -14,12 +14,24 @@ export default function Team({ id, name }) {
   const [playMusic, { stop }] = useSound("/sfx/oscars.mp3");
   const [playAlarm] = useSound("/sfx/alarm.mp3");
 
-  console.log("teamData", data);
+//   console.log("teamData", data);
+  const socket = useContext(SocketContext); 
+//   console.log(socket.id);
 
   const { setActiveAlert } = useContext(AlertContext);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [memberSelected, setSelectedMember] = useState({ id: "", name: "" });
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log(socket.id);
+
+      socket.emit("join-room", { id, name });
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   function activateAlert() {
     console.log("Fire donut event for everyone");
@@ -28,8 +40,11 @@ export default function Team({ id, name }) {
 
     setActiveAlert(true);
     playAlarm();
+    socket.emit("trigger-alarm", { id, name });
+
     setTimeout(() => {
       setActiveAlert(false);
+      socket.emit("stop-alarm", { id, name });
     }, 2500);
   }
 
