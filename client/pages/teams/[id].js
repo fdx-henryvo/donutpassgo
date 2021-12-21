@@ -141,7 +141,7 @@ export async function getStaticPaths() {
   const { teams } = await res.json();
 
   const paths = teams.map((team) => ({
-    params: { id: team.id.toString() },
+    params: { id: team?.id.toString() },
   }));
 
   return {
