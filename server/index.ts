@@ -8,7 +8,10 @@ const app = express();
 const port = 8000;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  // options
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
 app.use(cors());
@@ -49,7 +52,21 @@ app.put("/teamMembers/:memberId", (req, res) => {
 
 io.on("connection", (socket: Socket) => {
   // ...
-  console.log("New websocket connection");
+  console.log("New websocket connection", socket?.id);
+
+  socket.on("join-room", ({ id, name }) => {
+      console.log(socket.id + " joining " + `${id}-${name}`);
+      socket.join(`${id}-${name}`)
+  });
+
+  socket.on("trigger-alarm", ({ id, name }) => {
+      console.log("trigger-alarm" + `${id}-${name}`);
+      io.to(`${id}-${name}`).emit("alarm", true);
+  });
+
+  socket.on("stop-alarm", ({ id, name }) => {
+      io.to(`${id}-${name}`).emit("alarm", false);
+  });
 });
 
 // io.on()
