@@ -10,6 +10,12 @@ export default function Home({ teams }) {
         <title>donut • pass • go</title>
         <meta name="description" content="Donut pass go - companion app" />
         <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="preload"
+          href="/fonts/PressStart2p.ttf"
+          as="font"
+          crossOrigin=""
+        />
       </Head>
 
       <main className={styles.main}>
@@ -17,25 +23,14 @@ export default function Home({ teams }) {
 
         <div className={styles.grid}>
           {teams.map((team) => (
-            <Link href={`/teams/${team.id}`}>
+            <Link href={`/teams/${team.id}`} key={team.id}>
               <a>{team.name}</a>
             </Link>
           ))}
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+            {/* <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} /> */}
     </div>
   );
 }
