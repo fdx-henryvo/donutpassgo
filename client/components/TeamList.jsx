@@ -7,11 +7,22 @@ const TeamList = ({ members }) => {
     <ol className="list-decimal list-inside">
       {members &&
         members.map((member) => (
-          <li key={member.id} className="relative mb-4">
+          <li
+            key={member.id}
+            className="relative mb-4 text-shadow tracking-tighter uppercase"
+          >
             {/* <Image src="https://via.placeholder.com/50" width="50" height="50" alt={member.name}></Image> */}
-            <img src="https://i.pravatar.cc/75" width="75" height="75" className="inline-block mr-4" alt={member.name} />
+            <img
+              src="https://i.pravatar.cc/75"
+              width="75"
+              height="75"
+              className="inline-block mr-1 -ml-2"
+              alt={member.name}
+            />
             {member.name}
-            <span className="absolute right-2 top-1/2 -translate-y-1/2">{member.donutCount}</span>
+            <span className="absolute right-2 top-1/2 -translate-y-1/2">
+              {member.donutCount}
+            </span>
           </li>
         ))}
     </ol>
