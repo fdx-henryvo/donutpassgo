@@ -4,12 +4,15 @@ import TeamList from "../../components/TeamList";
 import { useContext, useState } from "react";
 import { AlertContext } from "../_app";
 import Modal from "react-modal";
+import useSound from "use-sound";
 
 const fetcher = (args) => fetch(args).then((res) => res.json());
 Modal.setAppElement("#__next");
 
 export default function Team({ id, name }) {
   const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
+  const [playMusic, { stop }] = useSound("/sfx/oscars.mp3");
+  const [playAlarm] = useSound("/sfx/alarm.mp3");
 
   console.log("teamData", data);
 
@@ -23,10 +26,11 @@ export default function Team({ id, name }) {
     // setIsOpen(true);
     openModal();
 
-    // setActiveAlert(true);
-    // setTimeout(() => {
-    //   setActiveAlert(false);
-    // }, 3000);
+    setActiveAlert(true);
+    playAlarm();
+    setTimeout(() => {
+      setActiveAlert(false);
+    }, 2500);
   }
 
   function openModal() {
@@ -152,12 +156,17 @@ export default function Team({ id, name }) {
         </div>
       </Modal>
       <footer className="fixed bottom-0 left-0 h-auto w-full">
-        <div className="container mx-auto p-8 text-center">
+        <div className="container mx-auto p-8 md:p-24 text-center">
           <button
             className="p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
             onClick={activateAlert}
           >
             DONUTS
+          </button>
+
+          <button onClick={playMusic} className="absolute right-8 bottom-8">
+            Music
+            {/* {playing ? "Music" : "■"} */}
           </button>
         </div>
       </footer>

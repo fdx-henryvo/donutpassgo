@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import FlipMove from "react-flip-move";
+import { ImagePixelated } from "react-pixelate";
 
 class TeamList extends Component {
   constructor(props) {
@@ -25,6 +26,14 @@ class TeamList extends Component {
             className="inline-block mr-8 border-white border-2 border-solid"
             alt={member.name}
           />
+
+          {/* <ImagePixelated
+            src="https://via.placeholder.com/150x150"
+            width={500}
+            height={300}
+            fillTransparencyColor={"grey"}
+          /> */}
+
           {member.name}
           <span className="absolute right-2 top-1/2 -translate-y-1/2">
             {member.donutCount}
