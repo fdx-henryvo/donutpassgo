@@ -1,15 +1,17 @@
 import express from "express";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
+import cors from "cors";
 
 const data = require("./models/seed.json");
-
 const app = express();
 const port = 8000;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   // options
 });
+
+app.use(cors());
 
 /*
  * Endpoints
@@ -37,7 +39,9 @@ app.get("/teams/:teamId/members", (req, res) => {
 });
 
 app.get("/teamMembers/:memberId", (req, res) => {});
-app.patch("/teamMembers/:memberId", (req, res) => {}); // only send through the updated donutCount
+app.put("/teamMembers/:memberId", (req, res) => {
+    res.send("Got a PUT request at /teamMembers");
+}); // only send through the updated donutCount
 
 /*
  * Sockets
