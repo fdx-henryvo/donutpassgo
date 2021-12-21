@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       fontSize: "text-lg",
-      letterSpacing: "tracking-tighter"
+      // letterSpacing: "tracking-tighter"
     },
   },
   plugins: [],

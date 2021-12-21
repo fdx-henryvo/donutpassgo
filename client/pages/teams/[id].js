@@ -15,117 +15,146 @@ export default function Team({ id, name }) {
 
   const { setActiveAlert } = useContext(AlertContext);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [memberSelected, setSelectedMember] = useState({id: "", name: ""});
+  const [memberSelected, setSelectedMember] = useState({ id: "", name: "" });
+  const [submitIsDisabled, setSubmitDisabled] = useState(false);
 
   function activateAlert() {
     console.log("Fire donut event for everyone");
-    setIsOpen(true);
+    // setIsOpen(true);
+    openModal();
 
-    setActiveAlert(true);
-    setTimeout(() => {
-      setActiveAlert(false);
-    }, 3000);
+    // setActiveAlert(true);
+    // setTimeout(() => {
+    //   setActiveAlert(false);
+    // }, 3000);
   }
 
-  function closeModal() {
-    setIsOpen(false);
-
+  function openModal() {
+    setIsOpen(true);
     setSelectedMember({
       id: "",
       name: "",
     });
   }
 
+  function closeModal() {
+    setIsOpen(false);
+  }
+
   function selectMember(id) {
-      console.log("ID",id)
-      if (data?.members) {
-          
-          const member = data.members.find((member) => member.id === id);
-          console.log(member);
-          setSelectedMember({
-              id: member.id,
-              name: member.name
-          })
-      }
+    console.log("ID", id);
+    if (data?.members) {
+      const member = data.members.find((member) => member.id === id);
+      console.log(member);
+      setSelectedMember({
+        id: member.id,
+        name: member.name,
+      });
+    }
+  }
+
+  function sortMembers(members) {
+    console.log("sort em");
+    //   [...members].sort((a, b) => b.donutCount - a.donutCount)
+
+    return members && [...members].sort((a, b) => b.donutCount - a.donutCount);
+  }
+
+  async function increaseDonutCount() {
+    const selectedMember = data?.members?.find(
+      (m) => m.id === memberSelected?.id
+    );
+    if (selectedMember) {
+      selectedMember.donutCount++;
+
+      console.log("send this as POST: ", selectedMember);
+
+      setSubmitDisabled(true);
+      await updateTeamMember(selectedMember);
+      setSubmitDisabled(false);
+    }
+
+    closeModal();
+  }
+
+  async function updateTeamMember(member) {
+    const requestOptions = {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(member),
+    };
+
+    console.log(requestOptions);
+
+    return await fetch(
+      `http://localhost:8000/teamMembers/${member.id}`,
+      requestOptions
+    );
+
+    //   return res.json();
   }
 
   return (
     <Layout>
-      <h1 className="text-2xl text-center my-4">{name}</h1>
-      <TeamList members={data?.members} />
+      <h1 className="text-2xl text-center uppercase my-4 text-shadow text-pink-500">
+        {name}
+      </h1>
+      <TeamList members={sortMembers(data?.members)} />
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Example Modal"
+        contentLabel="Select Modal"
       >
-        <button onClick={closeModal} className="absolute top-4 right-4">
-          X
-        </button>
-        <h2 className="mb-4">Who done deserve da donut?</h2>
-
-        <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {data?.members &&
-            data.members?.map((member) => (
-              <>
-                <li key={member.id}>
-                  <button
-                    onClick={() => selectMember(member.id)}
-                    className="focus:ring focus:ring-blue-800 bg-gray-300 rounded-sm"
-                  >
-                    <img
-                      src={member.photoUrl}
-                      height="150"
-                      width="150"
-                      alt={member.name}
-                    />
-                    <span className="uppercase text-xs">
-                      {member.name.split(" ")[0]}
-                    </span>
-                  </button>
-                </li>
-                {/* <li key={member.id}>
-                  <button>
-                    <img
-                      src={member.photoUrl}
-                      height="150"
-                      width="150"
-                      alt={member.name}
-                    />
-                    <span className="uppercase text-xs">
-                      {member.name.split(" ")[0]}
-                    </span>
-                  </button>
-                </li>
-                <li key={member.id}>
-                  <button>
-                    <img
-                      src={member.photoUrl}
-                      height="150"
-                      width="150"
-                      alt={member.name}
-                    />
-                    <span className="uppercase text-xs">
-                      {member.name.split(" ")[0]}
-                    </span>
-                  </button>
-                </li> */}
-              </>
-            ))}
-        </ul>
-
-        <div className="text-center mt-8">
-          <button className="text-center bg-black text-white p-4 uppercase">
-            {memberSelected?.name ? memberSelected?.name : "WHO"}
-
-            <span> GETS A DONUT</span>
-            {!memberSelected?.name && "?"}
+        <div className="p-8">
+          <button onClick={closeModal} className="absolute top-4 right-4">
+            X
           </button>
+          <h2 className="text-center text-2xl mb-8">PLAYER SELECT</h2>
+
+          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {data?.members &&
+              data.members?.map((member) => (
+                <>
+                  <li key={member.id}>
+                    <button
+                      onClick={() => selectMember(member.id)}
+                      className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
+                    >
+                      <img
+                        src={member.photoUrl}
+                        height="150"
+                        width="150"
+                        alt={member.name}
+                      />
+                      <span className="uppercase text-xs">
+                        {member.name.split(" ")[0]}
+                      </span>
+                    </button>
+                  </li>
+                </>
+              ))}
+          </ul>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={increaseDonutCount}
+              disabled={submitIsDisabled}
+              className="text-center bg-black text-white p-4 uppercase"
+            >
+              {/* {submitIsDisabled && "Loading"} */}
+              {/* {submitIsDisabled} */}
+              {memberSelected?.name ? memberSelected?.name : "WHO"}
+
+              <span> GETS A DONUT</span>
+              {!memberSelected?.name && "?"}
+            </button>
+          </div>
         </div>
       </Modal>
-      <footer className="fixed bottom-0 left-0 h-auto bg-gray-500 w-full">
-        <div className="container mx-auto p-4 text-center">
+      <footer className="fixed bottom-0 left-0 h-auto w-full">
+        <div className="container mx-auto p-8 text-center">
           <button
-            className="p-4 bg-black text-white focus:ring focus:ring-blue-800"
+            className="p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
             onClick={activateAlert}
           >
             DONUTS
