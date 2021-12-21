@@ -158,7 +158,7 @@ export default function Team({ id, name }) {
       <footer className="fixed bottom-0 left-0 h-auto w-full">
         <div className="container mx-auto p-8 md:p-24 text-center">
           <button
-            className="p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
+            className="text-xl p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
             onClick={activateAlert}
           >
             DONUTS

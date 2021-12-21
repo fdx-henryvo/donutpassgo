@@ -13,13 +13,16 @@ export default function Home({ teams }) {
         <div className={styles.grid}>
           {teams.map((team) => (
             <Link href={`/teams/${team.id}`} key={team.id}>
-              <a className="focus:ring focus:ring-pink-600">{team.name}</a>
+              <a className="focus:ring focus:ring-pink-600 m-4">
+                <span className="text-center h-16 flex justify-center items-center w-16 mx-auto mb-4 bg-black text-white align-middle">{team.name[0]}</span>
+                {team.name}
+              </a>
             </Link>
           ))}
         </div>
       </main>
 
-            {/* <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} /> */}
+      {/* <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} /> */}
     </Layout>
   );
 }
