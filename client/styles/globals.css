@@ -25,6 +25,11 @@ body {
   
 }
 
+.bg-papaya {
+  
+  background-color: papayawhip;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -42,4 +47,13 @@ a {
 .pink-text-shadow {
   
   -webkit-text-stroke: 1px hotpink;
+}
+
+.team-select__arrow {
+  visibility: hidden;
+}
+
+.team-select:hover .team-select__arrow,
+.team-select:active .team-select__arrow {
+  visibility: visible;
 }
