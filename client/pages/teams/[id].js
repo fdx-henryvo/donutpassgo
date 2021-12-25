@@ -1,50 +1,77 @@
 import useSWR from "swr";
+import { io } from "socket.io-client";
+
 import Layout from "../../components/Layout";
 import TeamList from "../../components/TeamList";
-import { useContext, useState, useEffect } from "react";
-import { AlertContext, SocketContext } from "../_app";
+import { useContext, useState, useEffect, useRef } from "react";
+import { AlertContext } from "../_app";
 import Modal from "react-modal";
 import useSound from "use-sound";
 
 const fetcher = (args) => fetch(args).then((res) => res.json());
+const WS_URL = "http://localhost:8000";
 Modal.setAppElement("#__next");
 
-export default function Team({ id, name }) {
-  const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
-  const [playMusic, { stop }] = useSound("/sfx/oscars.mp3");
-  const [playAlarm] = useSound("/sfx/alarm.mp3");
+// open socket in this copmonent only
 
-//   console.log("teamData", data);
-  const socket = useContext(SocketContext); 
-//   console.log(socket.id);
+export default function Team({ id, name }) {
+  // const socket = io.connect("http://localhost:8000");
+  const socketRef = useRef(null);
+  const [playMusic] = useSound("/sfx/oscars.mp3");
+  const [playAlarm] = useSound("/sfx/alarm.mp3");
 
   const { setActiveAlert } = useContext(AlertContext);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [memberSelected, setSelectedMember] = useState({ id: "", name: "" });
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
+  
+  const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
+  const [members, setMembers] = useState(data?.members);
+  // console.log(data);
 
   useEffect(() => {
+    // set initial member data
+    console.log("??", data)
+    if (data?.members) setMembers(data.members);
+
+    if (socketRef.current == null) {
+      socketRef.current = io(WS_URL);
+    }
+
+    const { current: socket } = socketRef;
+
     socket.on("connect", () => {
-      console.log(socket.id);
+      console.log("CONNECTED:", socket.id);
 
       socket.emit("join-room", { id, name });
     });
 
-    return () => socket.disconnect();
+    socket.on("alarm", (isAlarmOn) => {
+      console.log("client alarm triggered", socket.id, isAlarmOn);
+
+      setActiveAlert(isAlarmOn);
+    });
+
+    socket.on("member-updates", (members) => {});
+
+    return () => {
+      console.log("unmounting ", socket);
+      socket.disconnect();
+    };
   }, []);
 
   function activateAlert() {
     console.log("Fire donut event for everyone");
-    // setIsOpen(true);
     openModal();
 
-    setActiveAlert(true);
+    // setActiveAlert(true);
     playAlarm();
-    socket.emit("trigger-alarm", { id, name });
+    console.log("trigger alarm socket");
+    socketRef.current?.emit("trigger-alarm", { id, name });
 
     setTimeout(() => {
-      setActiveAlert(false);
-      socket.emit("stop-alarm", { id, name });
+      // setActiveAlert(false);
+      socketRef.current?.emit("stop-alarm", { id, name });
     }, 2500);
   }
 
@@ -73,9 +100,10 @@ export default function Team({ id, name }) {
   }
 
   function sortMembers(members) {
+    if (!members || !members.length) {
+      return [];
+    }
     console.log("sort em");
-    //   [...members].sort((a, b) => b.donutCount - a.donutCount)
-
     return members && [...members].sort((a, b) => b.donutCount - a.donutCount);
   }
 
@@ -118,7 +146,7 @@ export default function Team({ id, name }) {
       <h1 className="text-2xl text-center uppercase my-4 text-shadow text-pink-500">
         {name}
       </h1>
-      <TeamList members={sortMembers(data?.members)} />
+      <TeamList members={sortMembers(members)} />
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -133,24 +161,22 @@ export default function Team({ id, name }) {
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
             {data?.members &&
               data.members?.map((member) => (
-                <>
-                  <li key={member.id}>
-                    <button
-                      onClick={() => selectMember(member.id)}
-                      className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
-                    >
-                      <img
-                        src={member.photoUrl}
-                        height="150"
-                        width="150"
-                        alt={member.name}
-                      />
-                      <span className="uppercase text-xs">
-                        {member.name.split(" ")[0]}
-                      </span>
-                    </button>
-                  </li>
-                </>
+                <li key={member.id}>
+                  <button
+                    onClick={() => selectMember(member.id)}
+                    className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
+                  >
+                    <img
+                      src={member.photoUrl}
+                      height="150"
+                      width="150"
+                      alt={member.name}
+                    />
+                    <span className="uppercase text-xs">
+                      {member.name.split(" ")[0]}
+                    </span>
+                  </button>
+                </li>
               ))}
           </ul>
 

@@ -54,8 +54,15 @@ io.on("connection", (socket: Socket) => {
   // ...
   console.log("New websocket connection", socket?.id);
 
+//   io.of("/").sockets.size;
+//   io.engine.clientsCount;
+    console.log(Array.from(io.sockets.sockets.keys()).length)
+
   socket.on("join-room", ({ id, name }) => {
       console.log(socket.id + " joining " + `${id}-${name}`);
+
+    //   console.log(io.sockets.adapter.rooms[`${id}-${name}`]?.length);
+
       socket.join(`${id}-${name}`)
   });
 
@@ -66,6 +73,13 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("stop-alarm", ({ id, name }) => {
       io.to(`${id}-${name}`).emit("alarm", false);
+  });
+
+  socket.on("disconnect", (reason) => {
+    // ...
+    console.log("disconnect");
+    // io.disconnectSockets();
+
   });
 });
 

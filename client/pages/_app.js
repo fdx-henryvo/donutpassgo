@@ -1,5 +1,4 @@
 import { useState, createContext, useEffect } from "react";
-import { io } from "socket.io-client";
 import RedAlert from "../components/Alert";
 import "../styles/globals.css";
 
@@ -8,30 +7,30 @@ export const AlertContext = createContext({
   setActiveAlert: () => {},
 });
 
-export const socket = io.connect("http://localhost:8000");
-export const SocketContext = createContext();
+// export const socket = io.connect("http://localhost:8000");
+// export const SocketContext = createContext();
 
 function MyApp({ Component, pageProps }) {
   const [isAlertActive, setActiveAlert] = useState(false);
   const value = { isAlertActive, setActiveAlert };
   
-  useEffect(() => {
-    socket.on("alarm", (isAlarmOn) => {
-      console.log("client alarm triggered", socket.id, isAlarmOn);
+  // useEffect(() => {
+  //   socket.on("alarm", (isAlarmOn) => {
+  //     console.log("client alarm triggered", socket.id, isAlarmOn);
 
-      setActiveAlert(isAlarmOn);
-    });
+  //     setActiveAlert(isAlarmOn);
+  //   });
 
-    return () => socket.disconnect();
-  }, []);
+  //   return () => socket.disconnect();
+  // }, []);
 
   return (
-    <SocketContext.Provider value={socket}>
+    // <SocketContext.Provider value={socket}>
       <AlertContext.Provider value={value}>
         {isAlertActive ? <RedAlert /> : null}
         <Component {...pageProps} />
       </AlertContext.Provider>
-    </SocketContext.Provider>
+    // </SocketContext.Provider>
   );
 }
 
