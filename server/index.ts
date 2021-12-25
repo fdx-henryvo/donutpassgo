@@ -58,21 +58,32 @@ io.on("connection", (socket: Socket) => {
 //   io.engine.clientsCount;
     console.log(Array.from(io.sockets.sockets.keys()).length)
 
-  socket.on("join-room", ({ id, name }) => {
-      console.log(socket.id + " joining " + `${id}-${name}`);
+  socket.on("join-room", (room) => {
+      console.log(socket.id + " joining " + room);
 
-    //   console.log(io.sockets.adapter.rooms[`${id}-${name}`]?.length);
+    //   console.log(io.sockets.adapter.rooms[room]?.length);
 
-      socket.join(`${id}-${name}`)
+      socket.join(room)
   });
 
-  socket.on("trigger-alarm", ({ id, name }) => {
-      console.log("trigger-alarm" + `${id}-${name}`);
-      io.to(`${id}-${name}`).emit("alarm", true);
+  socket.on("trigger-alarm", (room) => {
+      console.log("trigger-alarm" + room);
+      io.to(room).emit("alarm", true);
   });
 
-  socket.on("stop-alarm", ({ id, name }) => {
-      io.to(`${id}-${name}`).emit("alarm", false);
+  socket.on("stop-alarm", (room) => {
+      io.to(room).emit("alarm", false);
+  });
+
+  socket.on("update-member", (member, room) => {
+      console.log(member?.id);
+      console.log(room);
+
+      // UPDATE THE DB MEMBERS
+      // ...
+
+      // emit new member lits
+      io.to(room).emit("update-member", member);
   });
 
   socket.on("disconnect", (reason) => {
@@ -82,9 +93,6 @@ io.on("connection", (socket: Socket) => {
 
   });
 });
-
-// io.on()
-// io.to("some room").emit("some event");
 
 httpServer.listen(port, () => {
   console.log(`App backend running on port ${port}!`);

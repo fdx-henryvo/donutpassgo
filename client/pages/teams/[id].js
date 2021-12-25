@@ -17,22 +17,31 @@ Modal.setAppElement("#__next");
 export default function Team({ id, name }) {
   // const socket = io.connect("http://localhost:8000");
   const socketRef = useRef(null);
+  const SOCKET_ROOM = `${id}-${name}`
   const [playMusic] = useSound("/sfx/oscars.mp3");
   const [playAlarm] = useSound("/sfx/alarm.mp3");
 
   const { setActiveAlert } = useContext(AlertContext);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [memberSelected, setSelectedMember] = useState({ id: "", name: "" });
+  const [memberSelected, setSelectedMember] = useState();
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
-  
-  const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
-  const [members, setMembers] = useState(data?.members);
-  // console.log(data);
+
+  // const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
+  const [members, setMembers] = useState([]);
+  // console.log("memes", members);
 
   useEffect(() => {
     // set initial member data
-    console.log("??", data)
-    if (data?.members) setMembers(data.members);
+    // console.log("??", data)
+    // const data = ;
+    
+    fetchMemberData().then(data => {
+      // console.log("fetched ", data?.members);
+      setMembers(data?.members)
+    });
+    // setMembers(fetchedMembers);
+
+    // if (data?.members) setMembers(data.members);
 
     if (socketRef.current == null) {
       socketRef.current = io(WS_URL);
@@ -43,7 +52,7 @@ export default function Team({ id, name }) {
     socket.on("connect", () => {
       console.log("CONNECTED:", socket.id);
 
-      socket.emit("join-room", { id, name });
+      socket.emit("join-room", SOCKET_ROOM);
     });
 
     socket.on("alarm", (isAlarmOn) => {
@@ -52,13 +61,30 @@ export default function Team({ id, name }) {
       setActiveAlert(isAlarmOn);
     });
 
-    socket.on("member-updates", (members) => {});
+    socket.on("update-member", (updatedMember) => {
+      const existingMemberIndex = members.findIndex(m => {
+        return m.id === updatedMember.id;
+      });
+      if (existingMember !== -1) {
+        const updatedMembers = [
+          ...members.slice(0, existingMemberIndex),
+          updatedMember,
+          ...members.slice(existingMemberIndex)
+        ];
+
+        setMembers(updatedMembers);
+      }
+    });
 
     return () => {
       console.log("unmounting ", socket);
       socket.disconnect();
     };
   }, []);
+
+  function fetchMemberData() {
+    return fetch(`http://localhost:8000/teams/${id}/members`).then(res => res.json());
+  }
 
   function activateAlert() {
     console.log("Fire donut event for everyone");
@@ -67,35 +93,27 @@ export default function Team({ id, name }) {
     // setActiveAlert(true);
     playAlarm();
     console.log("trigger alarm socket");
-    socketRef.current?.emit("trigger-alarm", { id, name });
+    socketRef.current?.emit("trigger-alarm", SOCKET_ROOM);
 
     setTimeout(() => {
       // setActiveAlert(false);
-      socketRef.current?.emit("stop-alarm", { id, name });
+      socketRef.current?.emit("stop-alarm", SOCKET_ROOM);
     }, 2500);
   }
 
   function openModal() {
     setIsOpen(true);
-    setSelectedMember({
-      id: "",
-      name: "",
-    });
+    setSelectedMember(null);
   }
 
   function closeModal() {
     setIsOpen(false);
   }
 
-  function selectMember(id) {
-    console.log("ID", id);
-    if (data?.members) {
-      const member = data.members.find((member) => member.id === id);
-      console.log(member);
-      setSelectedMember({
-        id: member.id,
-        name: member.name,
-      });
+  function selectMember(memberItem) {
+    if (members) {
+      console.log(memberItem);
+      setSelectedMember(memberItem);
     }
   }
 
@@ -103,21 +121,30 @@ export default function Team({ id, name }) {
     if (!members || !members.length) {
       return [];
     }
-    console.log("sort em");
+    // console.log("sort em");
     return members && [...members].sort((a, b) => b.donutCount - a.donutCount);
   }
 
   async function increaseDonutCount() {
-    const selectedMember = data?.members?.find(
+    const selectedMember = members.find(
       (m) => m.id === memberSelected?.id
     );
+    console.log(selectedMember);
     if (selectedMember) {
-      selectedMember.donutCount++;
+      // selectedMember.donutCount++;
 
-      console.log("send this as POST: ", selectedMember);
+      // console.log("send this as POST: ", selectedMember);
 
       setSubmitDisabled(true);
-      await updateTeamMember(selectedMember);
+
+      const updatedMember = {
+        ...selectedMember,
+        donutCount: selectedMember.donutCount + 1
+      }
+
+      await updateTeamMember(updatedMember);
+
+      // socket.emit("donut-add");
       setSubmitDisabled(false);
     }
 
@@ -125,20 +152,21 @@ export default function Team({ id, name }) {
   }
 
   async function updateTeamMember(member) {
-    const requestOptions = {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(member),
-    };
+    console.log("update memer", member);
+    socketRef.current?.emit("update-member", member, SOCKET_ROOM);
 
-    console.log(requestOptions);
+    // const requestOptions = {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(member),
+    // };
 
-    return await fetch(
-      `http://localhost:8000/teamMembers/${member.id}`,
-      requestOptions
-    );
+    // console.log(requestOptions);
 
-    //   return res.json();
+    // return await fetch(
+    //   `http://localhost:8000/teamMembers/${member.id}`,
+    //   requestOptions
+    // );
   }
 
   return (
@@ -159,11 +187,11 @@ export default function Team({ id, name }) {
           <h2 className="text-center text-2xl mb-8">PLAYER SELECT</h2>
 
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {data?.members &&
-              data.members?.map((member) => (
+            {members?.length &&
+              members.map((member) => (
                 <li key={member.id}>
                   <button
-                    onClick={() => selectMember(member.id)}
+                    onClick={() => selectMember(member)}
                     className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
                   >
                     <img
