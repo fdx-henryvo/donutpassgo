@@ -23,7 +23,7 @@ export default function Team({ id, name }) {
 
   const { setActiveAlert } = useContext(AlertContext);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [memberSelected, setSelectedMember] = useState();
+  const [memberSelected, setSelectedMember] = useState(null);
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
 
   // const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
@@ -62,18 +62,17 @@ export default function Team({ id, name }) {
     });
 
     socket.on("update-member", (updatedMember) => {
-      const existingMemberIndex = members.findIndex(m => {
-        return m.id === updatedMember.id;
-      });
-      if (existingMember !== -1) {
-        const updatedMembers = [
-          ...members.slice(0, existingMemberIndex),
-          updatedMember,
-          ...members.slice(existingMemberIndex)
-        ];
+      console.log("update members state with this: ", updatedMember)
+      console.log(updatedMember.id)
+      console.log("memos", members);
 
-        setMembers(updatedMembers);
-      }
+      setMembers(existingMembers => {
+        console.log('mem set', [...existingMembers])
+
+        const updatedMembers = updateMemberBasedOnId([...existingMembers], updatedMember)
+
+        return updatedMembers;
+      });
     });
 
     return () => {
@@ -167,6 +166,26 @@ export default function Team({ id, name }) {
     //   `http://localhost:8000/teamMembers/${member.id}`,
     //   requestOptions
     // );
+  }
+
+  function updateMemberBasedOnId(existingMembers, updatedMember) {
+    const existingMemberIndex = existingMembers.findIndex((m) => {
+      console.log("mid", m.id);
+      return m.id === updatedMember.id;
+    });
+
+    console.log(existingMemberIndex);
+    if (existingMemberIndex !== -1) {
+      const updatedMembers = [
+        ...existingMembers.slice(0, existingMemberIndex),
+        updatedMember,
+        ...existingMembers.slice(existingMemberIndex + 1), // exlude existingMember
+      ];
+
+      console.log('upmemz', updatedMembers)
+
+      return updatedMembers;
+    }
   }
 
   return (
