@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
+import { ActiveDirectoryService } from "./ActiveDirectoryService";
 
 const data = require("./models/seed.json");
 const app = express();
@@ -13,6 +14,7 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST"],
   },
 });
+const adService = new ActiveDirectoryService();
 
 app.use(cors());
 
@@ -21,6 +23,12 @@ app.use(cors());
  */
 
 app.get("/", (req, res) => res.status(200).json({ message: 'Connected!' }));
+
+app.get("/:id/photo", async (req,res) => {
+    const {id} = req.params;
+    const photo = await adService.getUserPhoto(id)
+    res.status(200).send(photo);
+})
 
 app.get("/teams", (req, res) => {
     const teams = data.teams;

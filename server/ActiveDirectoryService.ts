@@ -1,12 +1,14 @@
+import fetch from "cross-fetch";
 import { config } from "./config";
 
 export class ActiveDirectoryService {
   tokenEndpoint = config.ACTIVE_DIRECTORY.TOKEN_ENDPOINT;
 
-  async getUserPhoto(userId: string): Promise<string> {
+  async getUserPhoto(userId: string): Promise<any> {
     const photoPath = `users/${userId}/photo/$value`;
 
     const accessToken = await this.requestToken();
+
     const headers = {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
@@ -17,20 +19,16 @@ export class ActiveDirectoryService {
     try {
       const response = await this.fetchRetry(url, { method: "get", headers });
 
-      const body: ReadableStream = response.body;
-      const chunks = [];
-
-      for (const chunk of body) {
-        chunks.push(chunk);
-      }
-      return Buffer.concat(chunks).toString("base64");
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      return buffer.toString("base64");
     } catch (err) {
       console.log(`No profile picture found for ${userId}`);
       throw err;
     }
   }
 
-  async fetchRetry(url: string, config: RequestInit): Promise<Response> {
+  async fetchRetry(url: string, config): Promise<any> {
     return await fetch(url, config);
   }
 
