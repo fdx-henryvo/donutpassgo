@@ -21,7 +21,9 @@ export class ActiveDirectoryService {
 
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      return buffer.toString("base64");
+      return buffer;
+      // return "data:image/png;base64," + buffer.toString("base64");
+
     } catch (err) {
       console.log(`No profile picture found for ${userId}`);
       throw err;

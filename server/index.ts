@@ -27,7 +27,18 @@ app.get("/", (req, res) => res.status(200).json({ message: 'Connected!' }));
 app.get("/:id/photo", async (req,res) => {
     const {id} = req.params;
     const photo = await adService.getUserPhoto(id)
-    res.status(200).send(photo);
+
+    console.log("PHOTO?", photo)
+
+    // var img = Buffer.from(data, "base64");
+
+    res.writeHead(200, {
+      "Content-Type": "image/png",
+      "Content-Length": photo.length,
+    });
+    res.end(photo); 
+
+    // res.status(200).send(photo);
 })
 
 app.get("/teams", (req, res) => {
