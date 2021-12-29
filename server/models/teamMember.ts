@@ -1,8 +1,7 @@
 export interface TeamMember {
   id: string;
   name: string;
-  teamId: number;
+  teamId: string;
   donutCount: number;
   photoUrl?: string;
-  position?: number;
 }

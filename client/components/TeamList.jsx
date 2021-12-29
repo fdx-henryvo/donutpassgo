@@ -20,7 +20,7 @@ class TeamList extends Component {
         >
           {/* <Image src="https://via.placeholder.com/50" width="50" height="50" alt={member.name}></Image> */}
           <img
-            src={member.photoUrl}
+            src={member.photoPath}
             width="75"
             height="75"
             className="inline-block mr-8 border-white border-2 border-solid"

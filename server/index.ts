@@ -3,6 +3,7 @@ import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
 import { ActiveDirectoryService } from "./ActiveDirectoryService";
+import Jimp from "jimp";
 
 const data = require("./models/seed.json");
 const app = express();
@@ -30,15 +31,25 @@ app.get("/:id/photo", async (req,res) => {
 
     console.log("PHOTO?", photo)
 
-    // var img = Buffer.from(data, "base64");
+    const image = await Jimp.read(photo);
+    await image
+      .resize(150, 150)
+      .pixelate(3.5)
+      .brightness(-0.2)
+      .color([
+        { apply: "green", params: [0] },
+        { apply: "red", params: [10] },
+      ]);
+
+    await image.contrast(.5);
+
+    const base64Image = await image.getBufferAsync(Jimp.MIME_PNG);
 
     res.writeHead(200, {
-      "Content-Type": "image/png",
-      "Content-Length": photo.length,
+      "Content-Type": Jimp.MIME_PNG,
+      "Content-Length": base64Image.length,
     });
-    res.end(photo); 
-
-    // res.status(200).send(photo);
+    res.end(base64Image); 
 })
 
 app.get("/teams", (req, res) => {

@@ -17,7 +17,7 @@ Modal.setAppElement("#__next");
 export default function Team({ id, name }) {
   // const socket = io.connect("http://localhost:8000");
   const socketRef = useRef(null);
-  const SOCKET_ROOM = `${id}-${name}`
+  const SOCKET_ROOM = `${id}-${name}`;
   const [playMusic] = useSound("/sfx/oscars.mp3");
   const [playAlarm] = useSound("/sfx/alarm.mp3");
 
@@ -34,14 +34,19 @@ export default function Team({ id, name }) {
     // set initial member data
     // console.log("??", data)
     // const data = ;
-    
-    fetchMemberData().then(data => {
-      // console.log("fetched ", data?.members);
-      setMembers(data?.members)
-    });
-    // setMembers(fetchedMembers);
 
-    // if (data?.members) setMembers(data.members);
+    fetchMemberData().then((data) => {
+      // console.log("fetched ", data?.members);
+
+      const membersWithPhotos = data?.members.map((member) => {
+        return {
+          ...member,
+          photoPath: getPhotoUrl(member.id)
+        };
+      });
+
+      setMembers(membersWithPhotos);
+    });
 
     if (socketRef.current == null) {
       socketRef.current = io(WS_URL);
@@ -62,14 +67,15 @@ export default function Team({ id, name }) {
     });
 
     socket.on("update-member", (updatedMember) => {
-      console.log("update members state with this: ", updatedMember)
-      console.log(updatedMember.id)
-      console.log("memos", members);
+      console.log(updatedMember.id);
 
-      setMembers(existingMembers => {
-        console.log('mem set', [...existingMembers])
+      setMembers((existingMembers) => {
+        console.log("mem set", [...existingMembers]);
 
-        const updatedMembers = updateMemberBasedOnId([...existingMembers], updatedMember)
+        const updatedMembers = updateMemberBasedOnId(
+          [...existingMembers],
+          updatedMember
+        );
 
         return updatedMembers;
       });
@@ -82,7 +88,9 @@ export default function Team({ id, name }) {
   }, []);
 
   function fetchMemberData() {
-    return fetch(`http://localhost:8000/teams/${id}/members`).then(res => res.json());
+    return fetch(`http://localhost:8000/teams/${id}/members`).then((res) =>
+      res.json()
+    );
   }
 
   function activateAlert() {
@@ -120,30 +128,24 @@ export default function Team({ id, name }) {
     if (!members || !members.length) {
       return [];
     }
-    // console.log("sort em");
     return members && [...members].sort((a, b) => b.donutCount - a.donutCount);
   }
 
   async function increaseDonutCount() {
-    const selectedMember = members.find(
-      (m) => m.id === memberSelected?.id
-    );
+    const selectedMember = members.find((m) => m.id === memberSelected?.id);
     console.log(selectedMember);
     if (selectedMember) {
       // selectedMember.donutCount++;
-
-      // console.log("send this as POST: ", selectedMember);
 
       setSubmitDisabled(true);
 
       const updatedMember = {
         ...selectedMember,
-        donutCount: selectedMember.donutCount + 1
-      }
+        donutCount: selectedMember.donutCount + 1,
+      };
 
       await updateTeamMember(updatedMember);
 
-      // socket.emit("donut-add");
       setSubmitDisabled(false);
     }
 
@@ -152,20 +154,9 @@ export default function Team({ id, name }) {
 
   async function updateTeamMember(member) {
     console.log("update memer", member);
+
+    // socket will perform PUT on backend
     socketRef.current?.emit("update-member", member, SOCKET_ROOM);
-
-    // const requestOptions = {
-    //   method: "PUT",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(member),
-    // };
-
-    // console.log(requestOptions);
-
-    // return await fetch(
-    //   `http://localhost:8000/teamMembers/${member.id}`,
-    //   requestOptions
-    // );
   }
 
   function updateMemberBasedOnId(existingMembers, updatedMember) {
@@ -182,10 +173,15 @@ export default function Team({ id, name }) {
         ...existingMembers.slice(existingMemberIndex + 1), // exlude existingMember
       ];
 
-      console.log('upmemz', updatedMembers)
+      console.log("upmemz", updatedMembers);
 
       return updatedMembers;
     }
+  }
+
+  function getPhotoUrl(id) {
+    const API_URL = "http://localhost:8000";
+    return `${API_URL}/${id}/photo`;
   }
 
   return (
@@ -214,7 +210,7 @@ export default function Team({ id, name }) {
                     className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
                   >
                     <img
-                      src={member.photoUrl}
+                      src={member.photoPath}
                       height="150"
                       width="150"
                       alt={member.name}
