@@ -26,6 +26,7 @@ const Layout = ({ children }) => {
               src="/donut_pink2.png"
               height="40"
               width="40"
+              className="focus:ring focus:ring-pink-600"
             ></Image>
           </a>
         </Link>

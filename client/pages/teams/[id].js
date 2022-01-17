@@ -41,7 +41,7 @@ export default function Team({ id, name }) {
       const membersWithPhotos = data?.members.map((member) => {
         return {
           ...member,
-          photoPath: getPhotoUrl(member.id)
+          photoPath: getPhotoUrl(member.id),
         };
       });
 
@@ -189,71 +189,77 @@ export default function Team({ id, name }) {
       <h1 className="text-2xl text-center uppercase my-4 text-shadow text-pink-500">
         {name}
       </h1>
-      <TeamList members={sortMembers(members)} />
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Select Modal"
-      >
-        <div className="p-8">
-          <button onClick={closeModal} className="absolute top-4 right-4">
-            X
-          </button>
-          <h2 className="text-center text-2xl mb-8">PLAYER SELECT</h2>
-
-          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {members?.length &&
-              members.map((member) => (
-                <li key={member.id}>
-                  <button
-                    onClick={() => selectMember(member)}
-                    className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
-                  >
-                    <img
-                      src={member.photoPath}
-                      height="150"
-                      width="150"
-                      alt={member.name}
-                    />
-                    <span className="uppercase text-xs">
-                      {member.name.split(" ")[0]}
-                    </span>
-                  </button>
-                </li>
-              ))}
-          </ul>
-
-          <div className="text-center mt-8">
-            <button
-              onClick={increaseDonutCount}
-              disabled={submitIsDisabled}
-              className="text-center bg-black text-white p-4 uppercase"
-            >
-              {/* {submitIsDisabled && "Loading"} */}
-              {/* {submitIsDisabled} */}
-              {memberSelected?.name ? memberSelected?.name : "WHO"}
-
-              <span> GETS A DONUT</span>
-              {!memberSelected?.name && "?"}
-            </button>
-          </div>
-        </div>
-      </Modal>
-      <footer className="fixed bottom-0 left-0 h-auto w-full">
-        <div className="container mx-auto p-8 md:p-24 text-center">
-          <button
-            className="text-xl p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
-            onClick={activateAlert}
+      {members?.length ? (
+        <>
+          <TeamList members={sortMembers(members)} />
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            contentLabel="Select Modal"
           >
-            DONUTS
-          </button>
+            <div className="p-8">
+              <button onClick={closeModal} className="absolute top-4 right-4">
+                X
+              </button>
+              <h2 className="text-center text-2xl mb-8">PLAYER SELECT</h2>
 
-          <button onClick={playMusic} className="absolute right-8 bottom-8">
-            Music
-            {/* {playing ? "Music" : "■"} */}
-          </button>
-        </div>
-      </footer>
+              <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                {members?.length &&
+                  members.map((member) => (
+                    <li key={member.id}>
+                      <button
+                        onClick={() => selectMember(member)}
+                        className="focus:ring focus:ring-pink-600 bg-gray-300 rounded-sm"
+                      >
+                        <img
+                          src={member.photoPath}
+                          height="150"
+                          width="150"
+                          alt={member.name}
+                        />
+                        <span className="uppercase text-xs">
+                          {member.name.split(" ")[0]}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+
+              <div className="text-center mt-8">
+                <button
+                  onClick={increaseDonutCount}
+                  disabled={submitIsDisabled}
+                  className="text-center bg-black text-white p-4 uppercase"
+                >
+                  {/* {submitIsDisabled && "Loading"} */}
+                  {/* {submitIsDisabled} */}
+                  {memberSelected?.name ? memberSelected?.name : "WHO"}
+
+                  <span> GETS A DONUT</span>
+                  {!memberSelected?.name && "?"}
+                </button>
+              </div>
+            </div>
+          </Modal>
+          <footer className="fixed bottom-0 left-0 h-auto w-full">
+            <div className="container mx-auto p-8 md:p-24 text-center">
+              <button
+                className="text-xl p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
+                onClick={activateAlert}
+              >
+                DONUTS
+              </button>
+
+              <button onClick={playMusic} className="absolute right-8 bottom-8">
+                Music
+                {/* {playing ? "Music" : "■"} */}
+              </button>
+            </div>
+          </footer>
+        </>
+      ) : (
+        <p className="text-center mt-12">No team members</p>
+      )}
     </Layout>
   );
 }

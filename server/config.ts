@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 export const config = {
   ACTIVE_DIRECTORY: {
     CLIENT_ID: process.env["ACTIVE_DIRECTORY_CLIENT_ID"] || "",
