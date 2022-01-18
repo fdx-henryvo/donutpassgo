@@ -9,7 +9,8 @@ import Modal from "react-modal";
 import useSound from "use-sound";
 
 const fetcher = (args) => fetch(args).then((res) => res.json());
-const WS_URL = "http://52.64.24.209/api";
+const WS_URL = "http://52.64.24.209";
+// const WS_URL = "http://localhost:8000";
 Modal.setAppElement("#__next");
 
 // open socket in this copmonent only
@@ -51,6 +52,7 @@ export default function Team({ id, name }) {
 
     if (socketRef.current == null) {
       socketRef.current = io(WS_URL);
+      console.log(socketRef.current);
     }
 
     const { current: socket } = socketRef;
