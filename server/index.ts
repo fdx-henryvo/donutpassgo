@@ -5,7 +5,8 @@ import cors from "cors";
 import { ActiveDirectoryService } from "./ActiveDirectoryService";
 import Jimp from "jimp";
 
-const data = require("./models/seed.json");
+// const data = impor("./models/seed.json");
+import { data } from "./models/seed";
 const app = express();
 const port = 8000;
 const httpServer = createServer(app);
