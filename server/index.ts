@@ -116,6 +116,17 @@ io.on("connection", (socket: Socket) => {
       io.to(room).emit("update-member", member);
   });
 
+  socket.on("disable-donut-button", (room) => {
+    console.log('disable', room)
+    io.to(room).emit("disable-donut-button");
+  });
+  
+  socket.on("enable-donut-button", (room) => {
+    console.log('enable', room)
+    io.to(room).emit("enable-donut-button");
+  });
+  // disable-donut-button
+
   socket.on("disconnect", (reason) => {
     // ...
     console.log("disconnect");

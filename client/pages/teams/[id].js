@@ -25,6 +25,7 @@ export default function Team({ id, name }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [memberSelected, setSelectedMember] = useState(null);
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
+  const [donutButtonIsDisabled, setDonutButtonDisabled] = useState(false);
 
   // const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
   const [members, setMembers] = useState([]);
@@ -81,6 +82,13 @@ export default function Team({ id, name }) {
       });
     });
 
+    socket.on("disable-donut-button", () => {
+      setDonutButtonDisabled(true);
+    });
+    socket.on("enable-donut-button", () => {
+      setDonutButtonDisabled(false);
+    });
+
     return () => {
       console.log("unmounting ", socket);
       socket.disconnect();
@@ -111,10 +119,17 @@ export default function Team({ id, name }) {
   function openModal() {
     setIsOpen(true);
     setSelectedMember(null);
+
+    // disablethebutton
+    // setDonutDisable(true)
+    socketRef.current?.emit("disable-donut-button", SOCKET_ROOM);
   }
 
   function closeModal() {
     setIsOpen(false);
+
+    // setDonutDisable(true)
+    socketRef.current?.emit("enable-donut-button", SOCKET_ROOM);
   }
 
   function selectMember(memberItem) {
@@ -244,8 +259,9 @@ export default function Team({ id, name }) {
           <footer className="fixed bottom-0 left-0 h-auto w-full">
             <div className="container mx-auto p-8 md:p-24 text-center">
               <button
-                className="text-xl p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow"
+                className="text-xl p-4 bg-black text-white focus:ring focus:ring-pink-600 pink-text-shadow disabled:opacity-50"
                 onClick={activateAlert}
+                disabled={donutButtonIsDisabled}
               >
                 DONUTS
               </button>
