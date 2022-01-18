@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import { io } from "socket.io-client";
 
 import Layout from "../../components/Layout";
@@ -10,7 +9,6 @@ import useSound from "use-sound";
 
 const fetcher = (args) => fetch(args).then((res) => res.json());
 const WS_URL = "http://52.64.24.209";
-// const WS_URL = "http://localhost:8000";
 Modal.setAppElement("#__next");
 
 // open socket in this copmonent only
@@ -28,9 +26,7 @@ export default function Team({ id, name }) {
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
   const [donutButtonIsDisabled, setDonutButtonDisabled] = useState(false);
 
-  // const { data } = useSWR(`http://localhost:8000/teams/${id}/members`, fetcher);
   const [members, setMembers] = useState([]);
-  // console.log("memes", members);
 
   useEffect(() => {
     // set initial member data
@@ -52,7 +48,6 @@ export default function Team({ id, name }) {
 
     if (socketRef.current == null) {
       socketRef.current = io(WS_URL);
-      console.log(socketRef.current);
     }
 
     const { current: socket } = socketRef;
@@ -73,8 +68,6 @@ export default function Team({ id, name }) {
       console.log(updatedMember.id);
 
       setMembers((existingMembers) => {
-        console.log("mem set", [...existingMembers]);
-
         const updatedMembers = updateMemberBasedOnId(
           [...existingMembers],
           updatedMember
@@ -104,7 +97,6 @@ export default function Team({ id, name }) {
   }
 
   function activateAlert() {
-    console.log("Fire donut event for everyone");
     openModal();
 
     // setActiveAlert(true);
@@ -136,7 +128,6 @@ export default function Team({ id, name }) {
 
   function selectMember(memberItem) {
     if (members) {
-      console.log(memberItem);
       setSelectedMember(memberItem);
     }
   }
@@ -150,7 +141,6 @@ export default function Team({ id, name }) {
 
   async function increaseDonutCount() {
     const selectedMember = members.find((m) => m.id === memberSelected?.id);
-    console.log(selectedMember);
     if (selectedMember) {
       // selectedMember.donutCount++;
 
@@ -170,27 +160,21 @@ export default function Team({ id, name }) {
   }
 
   async function updateTeamMember(member) {
-    console.log("update memer", member);
-
     // socket will perform PUT on backend
     socketRef.current?.emit("update-member", member, SOCKET_ROOM);
   }
 
   function updateMemberBasedOnId(existingMembers, updatedMember) {
     const existingMemberIndex = existingMembers.findIndex((m) => {
-      console.log("mid", m.id);
       return m.id === updatedMember.id;
     });
 
-    console.log(existingMemberIndex);
     if (existingMemberIndex !== -1) {
       const updatedMembers = [
         ...existingMembers.slice(0, existingMemberIndex),
         updatedMember,
         ...existingMembers.slice(existingMemberIndex + 1), // exlude existingMember
       ];
-
-      console.log("upmemz", updatedMembers);
 
       return updatedMembers;
     }
