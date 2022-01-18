@@ -35,7 +35,7 @@ export default function Home({ teams }) {
 }
 
 export async function getStaticProps() {
-  const res = await fetch("http://localhost:8000/teams");
+  const res = await fetch("http://52.64.24.209/api/teams");
   const { teams } = await res.json();
 
   return {

@@ -9,13 +9,13 @@ import Modal from "react-modal";
 import useSound from "use-sound";
 
 const fetcher = (args) => fetch(args).then((res) => res.json());
-const WS_URL = "http://localhost:8000";
+const WS_URL = "http://52.64.24.209/api";
 Modal.setAppElement("#__next");
 
 // open socket in this copmonent only
 
 export default function Team({ id, name }) {
-  // const socket = io.connect("http://localhost:8000");
+  // const socket = io.connect("http://52.64.24.209/api");
   const socketRef = useRef(null);
   const SOCKET_ROOM = `${id}-${name}`;
   const [playMusic] = useSound("/sfx/oscars.mp3");
@@ -96,7 +96,7 @@ export default function Team({ id, name }) {
   }, []);
 
   function fetchMemberData() {
-    return fetch(`http://localhost:8000/teams/${id}/members`).then((res) =>
+    return fetch(`http://52.64.24.209/api/teams/${id}/members`).then((res) =>
       res.json()
     );
   }
@@ -195,7 +195,7 @@ export default function Team({ id, name }) {
   }
 
   function getPhotoUrl(id) {
-    const API_URL = "http://localhost:8000";
+    const API_URL = "http://52.64.24.209/api";
     return `${API_URL}/${id}/photo`;
   }
 
@@ -281,7 +281,7 @@ export default function Team({ id, name }) {
 }
 
 export async function getStaticPaths() {
-  const res = await fetch("http://localhost:8000/teams");
+  const res = await fetch("http://52.64.24.209/api/teams");
   const { teams } = await res.json();
 
   const paths = teams.map((team) => ({
@@ -295,7 +295,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const res = await fetch(`http://localhost:8000/teams/${params.id}`);
+  const res = await fetch(`http://52.64.24.209/api/teams/${params.id}`);
 
   const { team } = await res.json();
 

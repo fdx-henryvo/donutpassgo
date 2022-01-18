@@ -3,7 +3,7 @@ export function fetcher(args) {
 }
 
 export function getTeamMembers(teamId: string) {
-  return fetch(`http://localhost:8000/teams/${teamId}/members`).then((data) =>
+  return fetch(`http://52.64.24.209/api/teams/${teamId}/members`).then((data) =>
     data.json()
   );
 }

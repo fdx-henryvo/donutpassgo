@@ -7,7 +7,7 @@ export const AlertContext = createContext({
   setActiveAlert: () => {},
 });
 
-// export const socket = io.connect("http://localhost:8000");
+// export const socket = io.connect("http://52.64.24.209/api");
 // export const SocketContext = createContext();
 
 function MyApp({ Component, pageProps }) {
