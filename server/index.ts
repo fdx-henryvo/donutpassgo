@@ -19,8 +19,6 @@ const io = new Server(httpServer, {
 });
 const adService = new ActiveDirectoryService();
 
-console.log(data);
-
 app.use(cors());
 
 /*
