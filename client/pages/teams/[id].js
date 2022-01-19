@@ -283,14 +283,14 @@ export default function Team({ id, name }) {
               </h2>
 
               {/* yt embed autoplay */}
-              <div class="relative h-0 pb-yt">
+              <div className="relative h-0 pb-yt">
                 <iframe
                   src="https://www.youtube.com/embed/NoXLu9Rz70g?start=45"
                   frameBorder="0"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
                   title="video"
-                  class="absolute top-0 left-0 w-full h-full"
+                  className="absolute top-0 left-0 w-full h-full"
                 />
               </div>
             </div>
