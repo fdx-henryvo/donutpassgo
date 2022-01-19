@@ -7,6 +7,9 @@ module.exports = {
     extend: {
       fontSize: "text-lg",
       // letterSpacing: "tracking-tighter"
+      padding: {
+        yt: "56.25%",
+      },
     },
   },
   plugins: [],

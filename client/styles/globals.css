@@ -57,3 +57,13 @@ a {
 .team-select:active .team-select__arrow {
   visibility: visible;
 }
+
+.animate-flash {
+  animation: flash .8s step-start infinite;
+}
+
+@keyframes flash {
+  50% {
+    opacity: 0.1;
+  }
+}

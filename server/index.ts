@@ -142,6 +142,11 @@ io.on("connection", (socket: Socket) => {
     io.to(room).emit("alarm", false);
   });
 
+  socket.on("play-music", (room) => {
+    console.log("play da music")
+    io.to(room).emit("play-music", true);
+  });
+
   socket.on("update-member", (member, room) => {
     console.log(member?.id);
     console.log(room);

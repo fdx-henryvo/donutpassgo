@@ -20,8 +20,10 @@ export default function Team({ id, name }) {
   const [playMusic] = useSound("/sfx/oscars.mp3");
   const [playAlarm] = useSound("/sfx/alarm.mp3");
 
+  // let audio = new Audio("/sfx/oscars.mp3");
   const { setActiveAlert } = useContext(AlertContext);
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [musicModalIsOpen, setMusicModalIsOpen] = useState(false);
   const [memberSelected, setSelectedMember] = useState(null);
   const [submitIsDisabled, setSubmitDisabled] = useState(false);
   const [donutButtonIsDisabled, setDonutButtonDisabled] = useState(false);
@@ -62,6 +64,14 @@ export default function Team({ id, name }) {
       console.log("client alarm triggered", socket.id, isAlarmOn);
 
       setActiveAlert(isAlarmOn);
+      playAlarm();
+    });
+
+    socket.on("play-music", (isPlaying) => {
+      console.log("play it", isPlaying);
+      // console.log(playMusic)
+      // startAudio();
+      if (!musicModalIsOpen) setMusicModalIsOpen(true);
     });
 
     socket.on("update-member", (updatedMember) => {
@@ -126,6 +136,13 @@ export default function Team({ id, name }) {
     socketRef.current?.emit("enable-donut-button", SOCKET_ROOM);
   }
 
+  function closeMusicModal() {
+    setMusicModalIsOpen(false);
+
+    // setDonutDisable(true)
+    // socketRef.current?.emit("enable-donut-button", SOCKET_ROOM);
+  }
+
   function selectMember(memberItem) {
     if (members) {
       setSelectedMember(memberItem);
@@ -185,6 +202,12 @@ export default function Team({ id, name }) {
     return `${API_URL}/${id}/photo`;
   }
 
+  function emitMusicEvent() {
+    console.log("emit music", SOCKET_ROOM);
+    // playMusic();
+    socketRef.current?.emit("play-music", SOCKET_ROOM);
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl text-center uppercase my-4 text-shadow text-pink-500">
@@ -242,6 +265,37 @@ export default function Team({ id, name }) {
               </div>
             </div>
           </Modal>
+
+          <Modal
+            isOpen={musicModalIsOpen}
+            onRequestClose={closeMusicModal}
+            contentLabel="Music Modal"
+          >
+            <div className="p-8">
+              <button
+                onClick={closeMusicModal}
+                className="absolute top-4 right-4"
+              >
+                X
+              </button>
+              <h2 className="text-center text-2xl mb-8 animate-flash">
+                WRAP IT UP
+              </h2>
+
+              {/* yt embed autoplay */}
+              <div class="relative h-0 pb-yt">
+                <iframe
+                  src="https://www.youtube.com/embed/NoXLu9Rz70g?start=45"
+                  frameBorder="0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  title="video"
+                  class="absolute top-0 left-0 w-full h-full"
+                />
+              </div>
+            </div>
+          </Modal>
+
           <footer className="fixed bottom-0 left-0 h-auto w-full">
             <div className="container mx-auto p-8 md:p-24 text-center">
               <button
@@ -252,8 +306,12 @@ export default function Team({ id, name }) {
                 DONUTS
               </button>
 
-              <button onClick={playMusic} className="absolute right-8 bottom-8">
-                Music
+              <button
+                onClick={emitMusicEvent}
+                className="absolute right-8 bottom-8"
+                title="Play the music"
+              >
+                🎵
                 {/* {playing ? "Music" : "■"} */}
               </button>
             </div>
