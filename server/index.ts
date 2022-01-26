@@ -176,11 +176,17 @@ io.on("connection", (socket: Socket) => {
   });
 
   socket.on("update-member", (member, room) => {
-    console.log(member?.id);
-    console.log(room);
+    const { id, donutCount } = member;
 
-    // UPDATE THE DB MEMBERS
-    // ...
+    if (id && donutCount >= 0) {
+      connection.query(
+        "UPDATE team_member SET `donutCount` = ? WHERE `id` = ?",
+        [donutCount, id],
+        function (err, data) {
+          if (err) throw err;
+        }
+      );
+    }
 
     // emit new member lits
     io.to(room).emit("update-member", member);
