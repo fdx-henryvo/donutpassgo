@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS test_db;   
-CREATE DATABASE IF NOT EXISTS test_db;   
-USE test_db; 
+DROP DATABASE IF EXISTS dpg_db;   
+CREATE DATABASE IF NOT EXISTS dpg_db;   
+USE dpg_db; 
 
 DROP TABLE IF EXISTS team; 
 
