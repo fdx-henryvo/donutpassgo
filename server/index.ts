@@ -1,9 +1,13 @@
 import express from "express";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
+import mysql from "mysql2";
 import cors from "cors";
 import { ActiveDirectoryService } from "./ActiveDirectoryService";
 import Jimp from "jimp";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // const data = require("./models/seed.json");
 const { data } = require("./models/seed");
@@ -18,6 +22,24 @@ const io = new Server(httpServer, {
   },
 });
 const adService = new ActiveDirectoryService();
+
+const connection = mysql.createConnection({
+  host: process.env.DB_HOSTNAME,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+});
+
+connection.connect(function (err) {
+  if (err) {
+    console.error("Database connection failed: " + err.stack);
+    return;
+  }
+
+  console.log("Connected to database.");
+});
+
+// connection.end();
 
 app.use(cors());
 
@@ -70,23 +92,47 @@ app.get("/:id/photo", async (req, res) => {
 });
 
 app.get("/teams", (req, res) => {
-  console.log(data.teams);
-  const teams = data.teams;
 
-  res.status(200).json({ teams });
+  const sql = `SELECT * FROM team`;
+  connection.query(sql, function (err, data) {
+    if (err) throw err;
+    res.status(200).json({
+      teams: data
+    });
+  });
 });
 app.get("/teams/:teamId", (req, res) => {
   const id = parseInt(req.params.teamId);
-  const team = data.teams.find((t) => t.id === id);
+  connection.query(
+    "SELECT * FROM `team` WHERE `id` = ?",
+    [id],
+    function (err, data) {
+      console.log(data);
 
-  res.status(200).json({ team });
+      if (err) throw err;
+      res.status(200).json({
+        team: data[0],
+      });
+    }
+  );
 });
 
 app.get("/teams/:teamId/members", (req, res) => {
   const id = parseInt(req.params.teamId);
-  const members = data.teamMembers.filter((member) => member.teamId === id);
+  // const members = data.teamMembers.filter((member) => member.teamId === id);
 
-  res.status(200).json({ members });
+  connection.query(
+    "SELECT * FROM `team_member` WHERE `teamId` = ?",
+    [id],
+    function (err, data) {
+      console.log(data);
+
+      if (err) throw err;
+      res.status(200).json({
+        members: data,
+      });
+    }
+  );
 });
 
 app.get("/teamMembers/:memberId", (req, res) => {});
