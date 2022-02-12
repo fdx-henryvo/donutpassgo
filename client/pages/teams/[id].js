@@ -8,7 +8,8 @@ import Modal from "react-modal";
 import useSound from "use-sound";
 
 const fetcher = (args) => fetch(args).then((res) => res.json());
-const WS_URL = "http://52.64.24.209";
+const API_URL = process.env.API_URL;
+const WS_URL = process.env.WS_URL;
 Modal.setAppElement("#__next");
 
 // open socket in this copmonent only
@@ -101,9 +102,7 @@ export default function Team({ id, name }) {
   }, []);
 
   function fetchMemberData() {
-    return fetch(`http://52.64.24.209/api/teams/${id}/members`).then((res) =>
-      res.json()
-    );
+    return fetch(`${API_URL}/teams/${id}/members`).then((res) => res.json());
   }
 
   function activateAlert() {
@@ -198,7 +197,6 @@ export default function Team({ id, name }) {
   }
 
   function getPhotoUrl(id) {
-    const API_URL = "http://52.64.24.209/api";
     return `${API_URL}/${id}/photo`;
   }
 
@@ -325,7 +323,7 @@ export default function Team({ id, name }) {
 }
 
 export async function getStaticPaths() {
-  const res = await fetch("http://52.64.24.209/api/teams");
+  const res = await fetch(`${API_URL}/teams`);
   const { teams } = await res.json();
 
   const paths = teams.map((team) => ({
@@ -339,7 +337,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const res = await fetch(`http://52.64.24.209/api/teams/${params.id}`);
+  const res = await fetch(`${API_URL}/teams/${params.id}`);
 
   const { team } = await res.json();
 
