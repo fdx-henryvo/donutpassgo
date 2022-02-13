@@ -41,11 +41,14 @@ const verifyCache = (req, res, next) => {
   }
 };
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: process.env.DB_HOSTNAME,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
+  waitForConnections: true,
+  connectionLimit: 20,
+  queueLimit: 0
 });
 
 connection.connect(function (err) {
