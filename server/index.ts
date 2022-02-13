@@ -51,14 +51,14 @@ const connection = mysql.createPool({
   queueLimit: 0
 });
 
-connection.connect(function (err) {
-  if (err) {
-    console.error("Database connection failed: " + err.stack);
-    return;
-  }
+// connection.connect(function (err) {
+//   if (err) {
+//     console.error("Database connection failed: " + err.stack);
+//     return;
+//   }
 
-  console.log("Connected to database.");
-});
+//   console.log("Connected to database.");
+// });
 
 // connection.end();
 
