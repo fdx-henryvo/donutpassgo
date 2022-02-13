@@ -35,3 +35,5 @@ INSERT IGNORE INTO team_member (id, teamId, name, donutCount) VALUES ('b21d3b64-
 INSERT IGNORE INTO team_member (id, teamId, name, donutCount) VALUES ('2701e0df-f4f1-4da2-b181-eb4c936c996f', 1, 'Patricia McCarthy', 0);
 INSERT IGNORE INTO team_member (id, teamId, name, donutCount) VALUES ('d63615b8-b854-4909-bb02-69b659607bd4', 1, 'Johnny Le', 0);
 INSERT IGNORE INTO team_member (id, teamId, name, donutCount) VALUES ('65f4ed87-bb1f-4fd2-b7f6-80e6c0444f2e', 1, 'Suja Horne', 0);
+INSERT IGNORE INTO team_member (id, teamId, name, donutCount) VALUES ('2aac44b8-25a3-4e9e-831c-46a2d3db73a9', 1, 'Alex Mamayev', 0);
+INSERT IGNORE INTO team_member (id, teamId, name, donutCount) VALUES ('3c1dc27b-463c-4469-a0fc-7409df0b8fe2', 1, 'Sam Peacock', 0);
